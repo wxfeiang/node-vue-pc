@@ -3,7 +3,14 @@ const express = require("express");
 const router = express.Router();
 const User = require("../../models/User");
 const bcrypt = require("bcrypt");
-const gravatar = require("gravatar")
+const gravatar = require("gravatar");
+const jwt = require('jsonwebtoken');
+const keys = require("../../config/keys");
+const passport = require("passport");
+
+
+const validateRegisterInput = require("../../validation/register");
+const validateLoginInput = require("../../validation/login");
 
 // $route  GET api/users/test
 // @desc   返回的请求的json数据
@@ -19,6 +26,16 @@ router.get("/test", (req, res) => {
 router.post("/register", (req, res) => {
     // console.log(req.body)  
     // 查询数据库 
+    const {
+        errors,
+        isValid
+    } = validateRegisterInput(req.body); // 解构
+    // 判断是否通过
+    if (!isValid) {
+        return res.status(400).json(errors);
+    }
+
+
     User.findOne({
         email: req.body.email
     }).then((user) => {
@@ -58,14 +75,25 @@ router.post("/register", (req, res) => {
     })
 })
 // $route  post api/users/login
-// @desc   jet tocan
+// @desc   jwt tocan
 // @access public 登录接口
 router.post("/login", (req, res) => {
+    const {
+        errors,
+        isValid
+    } = validateLoginInput(req.body); // 解构
+    // 判断isValid是否通过
+    if (!isValid) {
+        return res.status(400).json(errors);
+    }
+
     // 获取到 
     const email = req.body.email;
     const password = req.body.password;
     // 查询是否存在
-    User.findOne({ email })
+    User.findOne({
+            email
+        })
         .then((user) => {
             if (!user) {
                 return res.status(400).json({
@@ -76,7 +104,25 @@ router.post("/login", (req, res) => {
             bcrypt.compare(password, user.password)
                 .then(isMatch => {
                     if (isMatch) {
-                        res.json({ msg: "sucess" })
+                        const rule = {
+                            id: user.id,
+                            name: user.name
+                        };
+                        //res.json({ msg: "sucess" })
+                        // jwt.sign("规则","加密名字","tocken 过期时间","cb")
+
+                        jwt.sign(rule, keys.secretOrKey, {
+                            expiresIn: 3600
+                        }, (err, token) => {
+                            if (err) throw err;
+                            res.json({
+                                sucess: true,
+                                // token: "mrw" + token
+                                token: "Bearer " + token //  固定格式
+
+
+                            })
+                        })
                     } else {
                         return res.status(400).json({
                             password: "密码错误!!!"
@@ -85,9 +131,23 @@ router.post("/login", (req, res) => {
                 })
 
         })
-
-
 })
 
 
+// $route  get api/users/current 
+// @desc   
+// @access public   请求当前信息    
+//  验证token
+router.get("/current", passport.authenticate('jwt', {
+    session: false
+}), (req, res) => {
+    // res.json(req.user)
+    // res.json({ msg: "sucess" })
+    res.json({ //  之前pssport.js 上返回 
+        id: req.user.id,
+        name: req.user.name,
+        email: req.user.email
+    });
+
+})
 module.exports = router;

@@ -13,7 +13,11 @@
     "bcrypt": "^3.0.2",
     "body-parser": "^1.18.3",
     "gravatar": "^1.8.0",
-    "mongoose": "^5.3.13"
+    "jsonwebtoken": "^8.4.0",
+    "mongoose": "^5.3.13",
+    "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
+    "validator": "^10.9.0"
   },
   "devDependencies": {
     "express": "^4.16.4"

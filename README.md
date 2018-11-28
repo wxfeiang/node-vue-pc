@@ -15,4 +15,7 @@
 
 ## 头像  npm install gravatar
 
-## tocken
+## npm install jsonwebtoken
+## npm install passport-jwt 验证token
+## npm install passport
+## validator验证用户信息  npm i validator

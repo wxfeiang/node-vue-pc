@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const passport = require("passport");
 const app = express();
 
 //users/.js
@@ -19,6 +20,9 @@ mongoose.connect(db, {
 // bodyParser 中间件使用
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
+// 初始化 
+app.use(passport.initialize()); 
+require("./config/passport")(passport);  // 数据分离
 
 //  根路径
 app.get("/", (req, res) => {
