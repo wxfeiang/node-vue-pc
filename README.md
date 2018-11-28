@@ -14,3 +14,5 @@
 ## win  安装注意  npm install bcrypt
 
 ## 头像  npm install gravatar
+
+## tocken
