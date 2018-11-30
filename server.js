@@ -20,6 +20,15 @@ mongoose.connect(db, {
 // bodyParser 中间件使用
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
+
+// 使用中间件实现允许跨域
+app.use((req,res,next) => {
+    res.header("Access-Control-Allow-Origin","*");
+    res.header("Access-Control-Allow-Headers","Content-Type");
+    res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+    next();
+  })
+
 // 初始化 
 app.use(passport.initialize()); 
 require("./config/passport")(passport);  // 数据分离
@@ -31,7 +40,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/users", users) // 上面引入进来的
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 8080;
 app.listen(port, () => {
     console.log(`Server  running  on prot  ${port}`)
 })
