@@ -30,5 +30,14 @@ router.post("/blog", (req, res) => {
 
   newBlog.save().then(blog => res.json(blog));
 });
+// 获取搜有得数据
+router.get("/blog", (req, res) => {
+  //console.log(req.body);
+  Blog.find()
+    .sort({ date: -1 })
+    .then(posts => res.json(posts))
+    .catch(err => res.status(404).json({ nopostsfound: "找不到任何评论信息" }));
+  //  按时间排序
+});
 
 module.exports = router;
